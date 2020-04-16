@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/verticalMoveButton"
+        android:layout_width="409dp"
+        android:layout_height="121dp"
+        android:onClick="moveVertical"
+        android:text="vertical"
+        app:layout_constraintEnd_toEndOf="@+id/forwardMoveButton"
+        app:layout_constraintStart_toStartOf="@+id/forwardMoveButton"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalMoveButton" />
+
+    <Button
+        android:id="@+id/horizontalMoveButton"
+        android:layout_width="409dp"
+        android:layout_height="120dp"
+        android:onClick="moveHorizontal"
+        android:text="horizontal"
+        app:layout_constraintEnd_toEndOf="@+id/verticalMoveButton"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/verticalMoveButton"
+        app:layout_constraintTop_toBottomOf="@+id/forwardMoveButton" />
+
+    <Button
+        android:id="@+id/forwardMoveButton"
+        android:layout_width="409dp"
+        android:layout_height="121dp"
+        android:onClick="moveForward"
+        android:text="forward"
+        app:layout_constraintEnd_toEndOf="@+id/deleteLastButton"
+        app:layout_constraintStart_toStartOf="@+id/deleteLastButton"
+        app:layout_constraintTop_toBottomOf="@+id/startButton" />
+
+    <Button
+        android:id="@+id/deleteLastButton"
+        android:layout_width="409dp"
+        android:layout_height="121dp"
+        android:enabled="false"
+        android:onClick="deleteLast"
+        android:text="delete last"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="204dp"
+        android:layout_height="121dp"
+        android:onClick="moveRandom"
+        android:text="start"
+        app:layout_constraintEnd_toStartOf="@+id/stopButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/stopButton"
+        android:layout_width="204dp"
+        android:layout_height="120dp"
+        android:enabled="false"
+        android:onClick="stopRandom"
+        android:text="stop"
+        app:layout_constraintBaseline_toBaselineOf="@+id/startButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/startButton" />
+</androidx.constraintlayout.widget.ConstraintLayout>
