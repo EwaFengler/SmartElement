@@ -23,7 +23,11 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager sensorManager;
+    private float[] accelerometerReading = new float[3];
+    private float[] magnetometerReading = new float[3];
+
     private Sensor accSensor;
+    private Sensor magneticField;
 
     private Button deleteLastButton;
     private String lastPath = "";
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Pobieramy menadżer odpowiedni dla kontekstu naszej aplikacji.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         startButton = findViewById(R.id.startButton);
         stopButton = findViewById(R.id.stopButton);
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         //Wartość SensorManager.SENSOR_DELAY_NORMAL oznacza domyślną częstotliwość napływania danych
         sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -71,10 +77,29 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         Sensor curSensor = event.sensor;
 
-        if (curSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            //Dane z magnetometru tylko sobie zapisuje
+            System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
+        } else if (curSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
+            float x = accelerometerReading[0];
+            float y = accelerometerReading[1];
+            float z = accelerometerReading[2];
+
+
+            // a orientacje obliczam na podstawie przyspieszenie i ostatniego odczytu magnetometru
+            // wtedy kiedy jest event od akcelerometru
+            float[] rotationMatrix = new float[9];
+            SensorManager.getRotationMatrix(rotationMatrix, null,
+                    accelerometerReading, magnetometerReading);
+
+            float[] orientationAngles = new float[3];
+            SensorManager.getOrientation(rotationMatrix, orientationAngles);
+
+            float azimuth = orientationAngles[0];
+            float pitch = orientationAngles[1];
+            float roll = orientationAngles[2];
+
 
             if (dataOutStream != null) {
                 if (startTimestamp == 0) {
@@ -82,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 long curTimestamp = event.timestamp;
 
-                dataOutStream.printf(Locale.US, "%d %f %f %f", curTimestamp - startTimestamp, x, y, z);
+                dataOutStream.printf(Locale.US, "%d %f %f %f %f %f %f", curTimestamp - startTimestamp, x, y, z, azimuth, pitch, roll);
                 dataOutStream.print(System.getProperty("line.separator"));
             }
         }
@@ -98,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void moveForward(View view) {
-        createFile("forward",true);
+        createFile("forward", true);
     }
 
     public void moveHorizontal(View view) {
@@ -137,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     public void run() {
                         closeStream();
                     }
-                }, 2 * 1000);
+                }, 1500);
             }
 
         } catch (FileNotFoundException e) {
