@@ -2,13 +2,8 @@ package com.example.smartelement;
 
 
 import android.util.Log;
-
 import org.tensorflow.lite.Interpreter;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +12,11 @@ public class MlpModel {
 
     private Interpreter interpreter;
 
-    public MlpModel(FileInputStream inputStream) throws IOException {
-        FileChannel fileChannel = inputStream.getChannel();
-        MappedByteBuffer tfliteModel = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
-        interpreter = new Interpreter(tfliteModel);
+    public MlpModel(Interpreter interpreter) {
+        if (interpreter == null){
+            Log.d("asdf", "NULL interpreter");
+        }
+        this.interpreter = interpreter;
     }
 
     public void run(){
@@ -50,8 +46,9 @@ public class MlpModel {
                 9.7874910e+00,-2.5923000e-02,-6.3610000e-03,-1.8435650e-01,
                 1.5322850e-01,1.0062828e+01,-1.5071500e-02,1.8699000e-02};
         Map<Integer, Object> output = new HashMap<>();
-
+        output.put(0, new float[1][3]); // nie wiem jaki powinien być output, ale coś tu trzeba wrzucić, do tej HashMapy
         interpreter.runForMultipleInputsOutputs(input, output);
         Log.d("asdf", output.toString());
+
     }
 }
