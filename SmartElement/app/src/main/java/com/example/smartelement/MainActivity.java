@@ -2,10 +2,12 @@ package com.example.smartelement;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -45,5 +47,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e("asdf", e.getMessage());
         }
+    }
+
+    public void startNewGame(View view) {
+        Intent i = new Intent(this, GameActivity.class);
+        startActivity(i);
     }
 }
