@@ -18,35 +18,12 @@ import java.nio.channels.FileChannel;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * Memory-map the model file in Assets.
-     */
-    private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
-            throws IOException {
-        AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        try {
-            AssetManager assetManager = getAssets();
-            String modelFilename = "ConvertedModel/converted_model.tflite";
-            Interpreter tflite = new Interpreter(loadModelFile(assetManager, modelFilename));
-
-            MlpModel mlpModel = new MlpModel(tflite);
-            mlpModel.run();
-
-        } catch (IOException e) {
-            Log.e("asdf", e.getMessage());
-        }
     }
 
     public void startNewGame(View view) {

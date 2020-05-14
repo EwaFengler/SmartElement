@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.smartelement"
-        minSdkVersion 22
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -24,6 +24,10 @@ android {
     aaptOptions {
         noCompress "tflite"
         noCompress "lite"
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 }
 
