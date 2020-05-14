@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Timer;
@@ -38,6 +39,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private long lastMoment = 0;
 
+    private final Object dataMonitor = new Object();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,24 +59,30 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         sensorData = new SensorData();
+
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                Deque<Float> data = sensorData.getData();
-//                if (data.size() == 100) {
-//                    double[] dataArray = data.stream().mapToDouble(i -> i).toArray();
-//                    mlpModel.run(dataArray);
+                synchronized (dataMonitor) {
+                    if (sensorData.getData().size() == 100) {
+                        float[] input = sensorData.getDataArray();
+                        float[] output = mlpModel.run(input);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            long zeros = data.stream().filter(i -> i == 0).count();
-                            Log.d("zeros", String.valueOf(zeros));
-                        }
-                    });
-//                }
+                        runOnUiThread(() -> {
+                            if (output[0] > 0.5) {
+                                Log.d("mlp", "horizontal " + output[0]);
+                            }
+                            if (output[1] > 0.5) {
+                                Log.d("mlp", "vertical " + output[1]);
+                            }
+                            if (output[2] > 0.5) {
+                                Log.d("mlp", "forward " + output[2]);
+                            }
+                        });
+                    }
+                }
             }
-        }, new Date(), 500);//TODO może być częściej (próbka co 62,5) ale żeby nie stwierdzało dwa razy tego samego
+        }, new Date(), 200);//TODO może być częściej (próbka co 62,5) ale żeby nie stwierdzało dwa razy tego samego
     }
 
     private void loadModel() throws IOException {
@@ -95,8 +104,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, accelerationSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, accelerationSensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -107,13 +116,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        long moment = event.timestamp / 63000000;// 1:16s
-        long moment = event.timestamp /   80000000;// 1:16s
+        long moment = event.timestamp / 62500000;// 1:16s
 
         if (moment != lastMoment) {
-            sensorData.addAveragedValues();
+            synchronized (dataMonitor) {
+                sensorData.addAveragedValues();
+                sensorData.removeOldestValues();
+            }
             sensorData.resetSensorValues();
-            sensorData.removeOldestValues();
             lastMoment = moment;
         }
 

@@ -22,7 +22,6 @@ public class SensorData {
     private int accelerationCounter = 0;
     private int magneticCounter = 0;
 
-
     public void addMagneticValues(float[] orientationAngles) {
         pitchSum += orientationAngles[1];
         rollSum += orientationAngles[2];
@@ -41,24 +40,24 @@ public class SensorData {
             xPrev = xSum / accelerationCounter;
             yPrev = ySum / accelerationCounter;
             zPrev = zSum / accelerationCounter;
-            data.add(xPrev);
-            data.add(yPrev);
-            data.add(zPrev);
-        } else { //TODO bezpieczniejsze wartości? (średnia? poprzednia?) Pominąć pomiar?
-            data.add(0f);
-            data.add(0f);
-            data.add(0f);
-            Log.e("zero counter", "accelerationCounter = 0");
         }
+        data.add(xPrev);
+        data.add(yPrev);
+        data.add(zPrev);
+
         if (magneticCounter > 0) {
             pitchPrev = pitchSum / magneticCounter;
             rollPrev = rollSum / magneticCounter;
-            data.add(pitchPrev);
-            data.add(rollPrev);
-        } else {
-            data.add(0f);
-            data.add(0f);
-            Log.e("zero counter", "magneticCounter = 0");
+        }
+        data.add(pitchPrev);
+        data.add(rollPrev);
+    }
+
+    public void removeOldestValues() {
+        if (data.size() > 100) {
+            for (int i = 0; i < 5; i++) {
+                data.removeFirst();
+            }
         }
     }
 
@@ -72,15 +71,16 @@ public class SensorData {
         magneticCounter = 0;
     }
 
-    public void removeOldestValues() {
-        if (data.size() > 100) {
-            for (int i = 0; i < 5; i++) {
-                data.removeFirst();
-            }
-        }
-    }
-
     public Deque<Float> getData() {
         return data;
+    }
+
+    public float[] getDataArray(){
+        float[] array = new float[data.size()];
+        int i = 0;
+        for (Float f : data) {
+            array[i++] = f;
+        }
+        return array;
     }
 }
