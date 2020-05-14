@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Pobieramy menadżer odpowiedni dla kontekstu naszej aplikacji.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         startButton = findViewById(R.id.startButton);
@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         //Wartość SensorManager.SENSOR_DELAY_NORMAL oznacza domyślną częstotliwość napływania danych
-        sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             //Dane z magnetometru tylko sobie zapisuje
             System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
-        } else if (curSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        } else if (curSensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
             float x = accelerometerReading[0];
             float y = accelerometerReading[1];
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             dir.mkdirs();
         }
 
-        String dataOutPath = String.format("%s/%2$td-%2$tm_%2$tH-%2$tM-%2$tS", dirPath, new Date());
+        String dataOutPath = String.format("%s/%2$td-%2$tm_%2$twd H-%2$tM-%2$tS", dirPath, new Date());
         lastPath = dataOutPath;
 
         try {
