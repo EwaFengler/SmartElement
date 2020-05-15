@@ -21,6 +21,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Deque;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,10 +31,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private MlpModel mlpModel;
 
     private SensorManager sensorManager;
+    private Sensor linearAccSensor;
     private Sensor accelerationSensor;
     private Sensor magneticSensor;
 
     private SensorData sensorData;
+    private float[] linearAccelerationReading = new float[3];
     private float[] accelerometerReading = new float[3];
     private float[] magnetometerReading = new float[3];
 
@@ -55,6 +58,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        linearAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
@@ -69,13 +73,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         float[] output = mlpModel.run(input);
 
                         runOnUiThread(() -> {
-                            if (output[0] > 0.5) {
+                            if (output[0] > 0.90) {
                                 Log.d("mlp", "horizontal " + output[0]);
                             }
-                            if (output[1] > 0.5) {
+                            if (output[1] > 0.90) {
                                 Log.d("mlp", "vertical " + output[1]);
                             }
-                            if (output[2] > 0.5) {
+                            if (output[2] > 0.90) {
                                 Log.d("mlp", "forward " + output[2]);
                             }
                         });
@@ -104,6 +108,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onResume() {
         super.onResume();
+        sensorManager.registerListener(this, linearAccSensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, accelerationSensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_GAME);
     }
@@ -131,10 +136,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             addMagneticSensorValues(event);
-
         } else if (curSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
-            sensorData.addAccelerationValues(accelerometerReading);
+        } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            System.arraycopy(event.values, 0, linearAccelerationReading, 0, linearAccelerationReading.length);
+            sensorData.addAccelerationValues(linearAccelerationReading);
         }
     }
 
