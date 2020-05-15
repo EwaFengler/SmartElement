@@ -1,7 +1,5 @@
 package com.example.moverecorder;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,12 +18,19 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager sensorManager;
+    private float[] linearAccelerationReading = new float[3];
     private float[] accelerometerReading = new float[3];
     private float[] magnetometerReading = new float[3];
 
+    private final float[] rotationMatrix = new float[9];
+    private final float[] orientationAngles = new float[3];
+
+    private Sensor linearAccSensor;
     private Sensor accSensor;
     private Sensor magneticField;
 
@@ -47,7 +52,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Pobieramy menadżer odpowiedni dla kontekstu naszej aplikacji.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        linearAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         startButton = findViewById(R.id.startButton);
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         //Wartość SensorManager.SENSOR_DELAY_NORMAL oznacza domyślną częstotliwość napływania danych
+        sensorManager.registerListener(this, linearAccSensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_GAME);
     }
@@ -75,26 +82,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Sensor curSensor = event.sensor;
 
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            //Dane z magnetometru tylko sobie zapisuje
-            System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
-        } else if (curSensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
-            float x = accelerometerReading[0];
-            float y = accelerometerReading[1];
-            float z = accelerometerReading[2];
+        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
+        } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
+            System.arraycopy(event.values, 0, linearAccelerationReading, 0, linearAccelerationReading.length);
 
+            float x = linearAccelerationReading[0];
+            float y = linearAccelerationReading[1];
+            float z = linearAccelerationReading[2];
 
-            // a orientacje obliczam na podstawie przyspieszenie i ostatniego odczytu magnetometru
-            // wtedy kiedy jest event od akcelerometru
-            float[] rotationMatrix = new float[9];
-            SensorManager.getRotationMatrix(rotationMatrix, null,
-                    accelerometerReading, magnetometerReading);
-
-            float[] orientationAngles = new float[3];
-            SensorManager.getOrientation(rotationMatrix, orientationAngles);
+            calculateOrientationAngles();
 
             float azimuth = orientationAngles[0];
             float pitch = orientationAngles[1];
@@ -111,6 +111,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 dataOutStream.print(System.getProperty("line.separator"));
             }
         }
+    }
+
+
+    public void calculateOrientationAngles() {
+        SensorManager.getRotationMatrix(rotationMatrix, null,
+                accelerometerReading, magnetometerReading);
+
+        SensorManager.getOrientation(rotationMatrix, orientationAngles);
     }
 
     public void moveRandom(View view) {
@@ -148,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             dir.mkdirs();
         }
 
-        String dataOutPath = String.format("%s/%2$td-%2$tm_%2$twd H-%2$tM-%2$tS", dirPath, new Date());
+        String dataOutPath = String.format("%s/%2$td-%2$tm_%2$tH-%2$tM-%2$tS", dirPath, new Date());
         lastPath = dataOutPath;
 
         try {
