@@ -1,7 +1,5 @@
 package com.example.smartelement;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Sensor;
@@ -18,12 +16,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Deque;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
@@ -32,13 +29,17 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager sensorManager;
     private Sensor linearAccSensor;
-    private Sensor accelerationSensor;
+    private Sensor gravitySensor;
     private Sensor magneticSensor;
 
     private SensorData sensorData;
     private float[] linearAccelerationReading = new float[3];
-    private float[] accelerometerReading = new float[3];
+    private float[] gravityReading = new float[3];
     private float[] magnetometerReading = new float[3];
+
+//    private String MODEL_FILENAME = "ConvertedModel/model_xyzpr.tflite";
+    private String MODEL_FILENAME = "ConvertedModel/model_xy_zgravity.tflite";
+
 
     private long lastMoment = 0;
 
@@ -59,8 +60,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         linearAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+//        magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         sensorData = new SensorData();
 
@@ -68,9 +69,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
                 synchronized (dataMonitor) {
-                    if (sensorData.getData().size() == 100) {
+                    if (sensorData.isDataReady()) {
                         float[] input = sensorData.getDataArray();
                         float[] output = mlpModel.run(input);
+
+                        log_output("mlp", output);
 
                         runOnUiThread(() -> {
                             if (output[0] > 0.90) {
@@ -89,8 +92,20 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }, new Date(), 200);//TODO może być częściej (próbka co 62,5) ale żeby nie stwierdzało dwa razy tego samego
     }
 
+    private void log_output(String tag, float[] output) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (float x : output){
+            int a = (int) (100 * x);
+            stringBuilder.append((float) a / 100);
+            stringBuilder.append(" ");
+        }
+
+        Log.d(tag, "\n" + stringBuilder.toString());
+    }
+
     private void loadModel() throws IOException {
-        String modelFilename = "ConvertedModel/converted_model.tflite";
+        String modelFilename = MODEL_FILENAME;
         Interpreter tflite = new Interpreter(loadModelFile(modelFilename));
         mlpModel = new MlpModel(tflite);
     }
@@ -109,8 +124,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
         sensorManager.registerListener(this, linearAccSensor, SensorManager.SENSOR_DELAY_GAME);
-        sensorManager.registerListener(this, accelerationSensor, SensorManager.SENSOR_DELAY_GAME);
-        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_GAME);
+//        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -125,8 +140,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         if (moment != lastMoment) {
             synchronized (dataMonitor) {
-                sensorData.addAveragedValues();
-                sensorData.removeOldestValues();
+                sensorData.update();
+//                sensorData.addAveragedValues();
+//                sensorData.removeOldestValues();
             }
             sensorData.resetSensorValues();
             lastMoment = moment;
@@ -135,9 +151,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         Sensor curSensor = event.sensor;
 
         if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            addMagneticSensorValues(event);
-        } else if (curSensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
+//            addMagneticSensorValues(event);
+        } else if (curSensor.getType() == Sensor.TYPE_GRAVITY) {
+            System.arraycopy(event.values, 0, gravityReading, 0, gravityReading.length);
+            sensorData.addGravityValues(gravityReading);
         } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             System.arraycopy(event.values, 0, linearAccelerationReading, 0, linearAccelerationReading.length);
             sensorData.addAccelerationValues(linearAccelerationReading);
@@ -149,7 +166,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         float[] rotationMatrix = new float[9];
         SensorManager.getRotationMatrix(rotationMatrix, null,
-                accelerometerReading, magnetometerReading);
+                gravityReading, magnetometerReading);
 
         float[] orientationAngles = new float[3];
         SensorManager.getOrientation(rotationMatrix, orientationAngles);
