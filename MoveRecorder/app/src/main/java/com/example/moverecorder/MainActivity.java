@@ -24,14 +24,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager sensorManager;
     private float[] linearAccelerationReading = new float[3];
-    private float[] accelerometerReading = new float[3];
+    private float[] gravityReading = new float[3];
     private float[] magnetometerReading = new float[3];
 
     private final float[] rotationMatrix = new float[9];
     private final float[] orientationAngles = new float[3];
 
     private Sensor linearAccSensor;
-    private Sensor accSensor;
+    private Sensor gravitySensor;
     private Sensor magneticField;
 
     private Button deleteLastButton;
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Pobieramy menadżer odpowiedni dla kontekstu naszej aplikacji.
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         linearAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
         magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         startButton = findViewById(R.id.startButton);
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         //Wartość SensorManager.SENSOR_DELAY_NORMAL oznacza domyślną częstotliwość napływania danych
         sensorManager.registerListener(this, linearAccSensor, SensorManager.SENSOR_DELAY_GAME);
-        sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_GAME);
     }
 
@@ -82,41 +82,55 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
+                break;
+            case Sensor.TYPE_GRAVITY:
+                System.arraycopy(event.values, 0, gravityReading, 0, gravityReading.length);
+                break;
+            case Sensor.TYPE_LINEAR_ACCELERATION:
+                System.arraycopy(event.values, 0, linearAccelerationReading, 0, linearAccelerationReading.length);
+                sendToStream(event.timestamp);
+                break;
+        }
+    }
 
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            System.arraycopy(event.values, 0, accelerometerReading, 0, accelerometerReading.length);
-        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
-        } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
-            System.arraycopy(event.values, 0, linearAccelerationReading, 0, linearAccelerationReading.length);
+    private void sendToStream(long timestamp) {
+        float x = linearAccelerationReading[0];
+        float y = linearAccelerationReading[1];
+        float z = linearAccelerationReading[2];
 
-            float x = linearAccelerationReading[0];
-            float y = linearAccelerationReading[1];
-            float z = linearAccelerationReading[2];
+        float xg = gravityReading[0];
+        float yg = gravityReading[1];
+        float zg = gravityReading[2];
 
-            calculateOrientationAngles();
+        calculateOrientationAngles();
 
-            float azimuth = orientationAngles[0];
-            float pitch = orientationAngles[1];
-            float roll = orientationAngles[2];
+        float azimuth = orientationAngles[0];
+        float pitch = orientationAngles[1];
+        float roll = orientationAngles[2];
 
 
-            if (dataOutStream != null) {
-                if (startTimestamp == 0) {
-                    startTimestamp = event.timestamp;
-                }
-                long curTimestamp = event.timestamp;
-
-                dataOutStream.printf(Locale.US, "%d %f %f %f %f %f %f", curTimestamp - startTimestamp, x, y, z, azimuth, pitch, roll);
-                dataOutStream.print(System.getProperty("line.separator"));
+        if (dataOutStream != null) {
+            if (startTimestamp == 0) {
+                startTimestamp = timestamp;
             }
+            long curTimestamp = timestamp;
+
+            dataOutStream.printf(Locale.US, "%d %f %f %f %f %f %f %f %f %f",
+                    curTimestamp - startTimestamp,
+                    x, y, z,
+                    xg, yg, zg,
+                    azimuth, pitch, roll);
+            dataOutStream.print(System.getProperty("line.separator"));
         }
     }
 
 
     public void calculateOrientationAngles() {
         SensorManager.getRotationMatrix(rotationMatrix, null,
-                accelerometerReading, magnetometerReading);
+                gravityReading, magnetometerReading);
 
         SensorManager.getOrientation(rotationMatrix, orientationAngles);
     }
