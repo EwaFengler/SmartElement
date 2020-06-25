@@ -18,7 +18,10 @@ public class GameWrapper {
     }
 
     public void onExecute() {
-        playerStatus.execute();
+        float attackStrength = playerStatus.execute();
+        if (attackStrength > 0) {
+            sendAttack(attackStrength);
+        }
     }
 
     public void onBluetooth() {
@@ -38,6 +41,10 @@ public class GameWrapper {
                 finishGame(GameResult.LOSE);
             }
         }
+    }
+
+    private void sendAttack(float attackStrength) {
+        //TODO
     }
 
     private void finishGame(GameResult gameResult) {
