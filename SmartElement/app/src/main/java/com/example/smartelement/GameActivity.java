@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import org.tensorflow.lite.Interpreter;
@@ -21,6 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.Guideline;
 
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
@@ -49,6 +51,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        GameWrapper gameWrapper = new GameWrapper(this);
 
         try {
             loadModel();
@@ -177,5 +181,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         //not implemented
+    }
+
+    public void finishGame(GameResult gameResult) {
+        //TODO
+    }
+
+    public void updateHealth(float damagePercentage) {
+        Guideline damageGuideline = findViewById(R.id.damageGuideline);
+        damageGuideline.setGuidelinePercent(damagePercentage);
     }
 }
