@@ -20,6 +20,21 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@+id/damageGuideline"
-        tools:layout_editor_absoluteX="16dp" />
+        tools:layout_editor_absoluteX="16dp" >
+
+        <Button
+            android:id="@+id/test_send_finish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="testSendFinish"
+            android:text="finish" />
+
+        <Button
+            android:id="@+id/test_send_attack_4.8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="testSendAttack"
+            android:text="attack_4.8" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

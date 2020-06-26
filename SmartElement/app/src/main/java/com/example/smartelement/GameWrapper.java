@@ -1,13 +1,40 @@
 package com.example.smartelement;
 
+import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.Toast;
+
 public class GameWrapper {
 
-    PlayerStatus playerStatus;
+
+    private final String MESSAGE_FINISH = "finish";
+    private final String MESSAGE_ATTACK_PREFIX = "attack_";
+
+    PlayerStatus playerStatus = new PlayerStatus();
     private GameActivity gameActivity;
+    private BluetoothChatService bluetoothChatService;
 
     public GameWrapper(GameActivity gameActivity) {
         this.gameActivity = gameActivity;
+        bluetoothChatService = BluetoothChatService.getInstance();
+        bluetoothChatService.setHandler(handler);
+
     }
+
+
+    @SuppressLint("HandlerLeak")
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == BluetoothChatService.MESSAGE_READ) {
+                byte[] readBuf = (byte[]) msg.obj;
+                String message = new String(readBuf, 0, msg.arg1);
+                Toast.makeText(gameActivity, message, Toast.LENGTH_SHORT).show();
+                onBluetooth(message);
+            }
+        }
+    };
 
     public void onAttack() {
         playerStatus.loadAttack();
@@ -24,16 +51,11 @@ public class GameWrapper {
         }
     }
 
-    public void onBluetooth() {
-        boolean isAttack = true; //TODO
-        boolean isFinish = false; //TODO
-
-        if (isFinish) {
+    public void onBluetooth(String message) {
+        if (message.equals(MESSAGE_FINISH)) {
             finishGame(GameResult.WIN);
-        }
-
-        if (isAttack) {
-            float damage = 0; //TODO
+        } else if (message.startsWith(MESSAGE_ATTACK_PREFIX)) {
+            float damage = Float.parseFloat(message.split(MESSAGE_ATTACK_PREFIX)[1]);
             playerStatus.receiveDamage(damage);
             updateHealth(playerStatus.getDamagePercentage());
 
@@ -43,11 +65,14 @@ public class GameWrapper {
         }
     }
 
-    private void sendAttack(float attackStrength) {
-        //TODO
+    public void sendAttack(float attackStrength) {
+        bluetoothChatService.sendMessage(MESSAGE_ATTACK_PREFIX + attackStrength);
     }
 
-    private void finishGame(GameResult gameResult) {
+    public void finishGame(GameResult gameResult) {
+        if (gameResult == GameResult.LOSE) {
+            bluetoothChatService.sendMessage(MESSAGE_FINISH);
+        }
         gameActivity.finishGame(gameResult);
     }
 

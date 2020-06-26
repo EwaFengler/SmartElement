@@ -46,13 +46,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private long lastMoment = 0;
 
     private final Object dataMonitor = new Object();
+    private GameWrapper gameWrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        GameWrapper gameWrapper = new GameWrapper(this);
+        gameWrapper = new GameWrapper(this);
 
         try {
             loadModel();
@@ -190,5 +191,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void updateHealth(float damagePercentage) {
         Guideline damageGuideline = findViewById(R.id.damageGuideline);
         damageGuideline.setGuidelinePercent(damagePercentage);
+    }
+
+    public void testSendFinish(View view) {
+        gameWrapper.finishGame(GameResult.LOSE);
+    }
+
+    public void testSendAttack(View view) {
+        gameWrapper.sendAttack((float) 4.8);
     }
 }
