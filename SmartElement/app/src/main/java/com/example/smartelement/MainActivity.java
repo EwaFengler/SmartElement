@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_BLUETOOTH_DEVICES_ACTIVITY = 2;
 
+    private boolean opponentAlreadyStarted = false;
+
     private BluetoothChatService bluetoothChatService = null;
 
     private View newGameButton;
@@ -65,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startNewGame(View view) {
-        Intent i = new Intent(this, GameActivity.class);
+        bluetoothChatService.sendMessage(CountdownActivity.MESSAGE_START_GAME);
+        Intent i = new Intent(this, CountdownActivity.class);
+        i.putExtra("opponentAlreadyStarted", opponentAlreadyStarted);
         startActivity(i);
     }
 
@@ -91,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     toast(readMessage);
+                    if (readMessage.equals(CountdownActivity.MESSAGE_START_GAME)) {
+                        opponentAlreadyStarted = true;
+                    }
                     break;
                 case BluetoothChatService.MESSAGE_DEVICE_NAME:
                     String opponentName = msg.getData().getString("device_name");
