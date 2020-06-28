@@ -24,11 +24,17 @@ public class MainActivity extends AppCompatActivity {
 
     private View newGameButton;
 
+    private boolean DEV_MODE = true; //TODO wywalić
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         newGameButton = findViewById(R.id.newGameButton);
+
+        if (DEV_MODE) {
+            newGameButton.setEnabled(true);
+        }
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!bluetoothAdapter.isEnabled()) {
@@ -67,10 +73,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startNewGame(View view) {
-        bluetoothChatService.sendMessage(CountdownActivity.MESSAGE_START_GAME);
-        Intent i = new Intent(this, CountdownActivity.class);
-        i.putExtra("opponentAlreadyStarted", opponentAlreadyStarted);
-        startActivity(i);
+        if (DEV_MODE) {
+            Intent i = new Intent(this, GameActivity.class);
+            startActivity(i);
+        } else {
+            bluetoothChatService.sendMessage(CountdownActivity.MESSAGE_START_GAME);
+            Intent i = new Intent(this, CountdownActivity.class);
+            i.putExtra("opponentAlreadyStarted", opponentAlreadyStarted);
+            startActivity(i);
+        }
     }
 
     private void closeGame() {

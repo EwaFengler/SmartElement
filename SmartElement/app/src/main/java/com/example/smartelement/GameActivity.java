@@ -39,8 +39,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private float[] gravityReading = new float[3];
     private float[] magnetometerReading = new float[3];
 
-//    private String MODEL_FILENAME = "ConvertedModel/model_xyzpr.tflite";
+    //    private String MODEL_FILENAME = "ConvertedModel/model_xyzpr.tflite";
     private String MODEL_FILENAME = "ConvertedModel/model_xy_zgravity.tflite";
+//    private String MODEL_FILENAME = "ConvertedModel/final_model_xy_zgravity.tflite";
 
 
     private long lastMoment = 0;
@@ -81,15 +82,29 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         log_output("mlp", output);
 
                         runOnUiThread(() -> {
-                            if (output[0] > 0.90) {
-                                Log.d("mlp", "horizontal " + output[0]);
-                            }
-                            if (output[1] > 0.90) {
-                                Log.d("mlp", "vertical " + output[1]);
-                            }
+//                            if (output[0] > 0.90) {
+//                                Log.d("mlp", "horizontal " + output[0]);
+//                            }
+//                            if (output[1] > 0.90) {
+//                                Log.d("mlp", "vertical " + output[1]);
+//                            }
+//                            if (output[2] > 0.90) {
+//                                Log.d("mlp", "forward " + output[2]);
+//                            }
+                            String move = "---- ";
+                            float certainty = Math.max(output[0], Math.max(output[1], output[2]));
+                            certainty = (float) ((int) (100 * certainty)) / 100;
+
+
                             if (output[2] > 0.90) {
-                                Log.d("mlp", "forward " + output[2]);
+                                move = "forward ";
+                                certainty = output[2];
+                            } else if (output[0] > 0.90 || output[1] > 0.90) {
+                                move = horizontalOrVertical(input);
+                                certainty = Math.max(output[0], output[1]);
                             }
+                            certainty = (float) ((int) (100 * certainty)) / 100;
+                            Log.d("mlp", move + certainty);
                         });
                     }
                 }
@@ -97,10 +112,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }, new Date(), 200);//TODO może być częściej (próbka co 62,5) ale żeby nie stwierdzało dwa razy tego samego
     }
 
+    private String horizontalOrVertical(float[] input) {
+        float sumZG = 0;
+        int len = input.length / 3;
+        for (int i = 0; i < len; i++) {
+            sumZG += input[3 * i + 2];
+        }
+
+        float meanZG = sumZG / len;
+
+        return Math.abs(meanZG) > 5 ? "horizontal " : "vertical ";
+    }
+
     private void log_output(String tag, float[] output) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (float x : output){
+        for (float x : output) {
             int a = (int) (100 * x);
             stringBuilder.append((float) a / 100);
             stringBuilder.append(" ");
