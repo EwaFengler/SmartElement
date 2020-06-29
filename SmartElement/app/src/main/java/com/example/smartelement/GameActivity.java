@@ -32,14 +32,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor linearAccSensor;
     private Sensor gravitySensor;
-    private Sensor magneticSensor;
 
     private SensorData sensorData;
     private float[] linearAccelerationReading = new float[3];
     private float[] gravityReading = new float[3];
-    private float[] magnetometerReading = new float[3];
 
-    private String MODEL_FILENAME = "ConvertedModel/model_xy_zgravity_df50.tflite";
+    private String MODEL_FILENAME = "ConvertedModel/hopefully_final_model_xy_zgravity.tflite";
 
 
     private long lastMoment = 0;
@@ -65,7 +63,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         linearAccSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
-//        magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         sensorData = new SensorData();
 
@@ -155,7 +152,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         sensorManager.registerListener(this, linearAccSensor, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_GAME);
-//        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -171,8 +167,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         if (moment != lastMoment) {
             synchronized (dataMonitor) {
                 sensorData.update();
-//                sensorData.addAveragedValues();
-//                sensorData.removeOldestValues();
             }
             sensorData.resetSensorValues();
             lastMoment = moment;
@@ -180,28 +174,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         Sensor curSensor = event.sensor;
 
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-//            addMagneticSensorValues(event);
-        } else if (curSensor.getType() == Sensor.TYPE_GRAVITY) {
+        if (curSensor.getType() == Sensor.TYPE_GRAVITY) {
             System.arraycopy(event.values, 0, gravityReading, 0, gravityReading.length);
             sensorData.addGravityValues(gravityReading);
         } else if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             System.arraycopy(event.values, 0, linearAccelerationReading, 0, linearAccelerationReading.length);
             sensorData.addAccelerationValues(linearAccelerationReading);
         }
-    }
-
-    private void addMagneticSensorValues(SensorEvent event) {
-        System.arraycopy(event.values, 0, magnetometerReading, 0, magnetometerReading.length);
-
-        float[] rotationMatrix = new float[9];
-        SensorManager.getRotationMatrix(rotationMatrix, null,
-                gravityReading, magnetometerReading);
-
-        float[] orientationAngles = new float[3];
-        SensorManager.getOrientation(rotationMatrix, orientationAngles);
-
-        sensorData.addMagneticValues(orientationAngles);
     }
 
     @Override
