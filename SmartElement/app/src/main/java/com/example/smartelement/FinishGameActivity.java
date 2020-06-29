@@ -1,11 +1,10 @@
 package com.example.smartelement;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class FinishGameActivity extends AppCompatActivity {
 
@@ -25,8 +24,6 @@ public class FinishGameActivity extends AppCompatActivity {
     }
 
     public void okButtonClicked(View view) {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
         finish();
     }
 }

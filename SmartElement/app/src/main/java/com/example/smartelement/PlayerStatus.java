@@ -12,21 +12,21 @@ public class PlayerStatus {
     private float shieldStrength = 0;
     private boolean over = false;
 
-    public void loadAttack() {
+    public synchronized void loadAttack() {
         attackLoaded++;
         if (shieldLoaded > 0) {
             shieldLoaded = 0;
         }
     }
 
-    public void loadShield() {
+    public synchronized void loadShield() {
         shieldLoaded++;
         if (attackLoaded > 0) {
             attackLoaded = 0;
         }
     }
 
-    public float execute() {
+    public synchronized float execute() {
         float attackStrength = 0;
 
         if (attackLoaded > 0) {
@@ -41,7 +41,7 @@ public class PlayerStatus {
         return attackStrength;
     }
 
-    public void receiveDamage(float damage) {
+    public synchronized void receiveDamage(float damage) {
         if (damage > shieldStrength) {
             shieldStrength = 0;
             health -= (damage - shieldStrength);
@@ -55,15 +55,15 @@ public class PlayerStatus {
         }
     }
 
-    public float getDamagePercentage() {
+    public synchronized float getDamagePercentage() {
         return 1 - (health / MAX_HEALTH);
     }
 
-    synchronized public float getShieldStrength() {
+    public synchronized float getShieldStrength() {
         return shieldStrength;
     }
 
-    public boolean isOver() {
+    public synchronized boolean isOver() {
         return over;
     }
 
