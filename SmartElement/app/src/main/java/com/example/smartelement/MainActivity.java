@@ -2,8 +2,10 @@ package com.example.smartelement;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -36,12 +38,35 @@ public class MainActivity extends AppCompatActivity {
             newGameButton.setEnabled(true);
         }
 
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (!bluetoothAdapter.isEnabled()) {
-            activateBluetooth();
+        if (sensorsAvailable()) {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (!bluetoothAdapter.isEnabled()) {
+                activateBluetooth();
+            } else {
+                setupChat();
+            }
         } else {
-            setupChat();
+            alertSensorNotAvailable();
         }
+    }
+
+    private boolean sensorsAvailable() {
+        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        boolean linearAcc = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null;
+        boolean gravityAcc = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null;
+
+        return linearAcc && gravityAcc;
+    }
+
+    private void alertSensorNotAvailable() {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Sensor niedostępny");
+        alertDialog.setMessage("Przepraszamy, nie możesz zagrać w tą grę. Twoje urządzenie nie posiada odpowiednich sensorów.");
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Zamknij grę", (dialog, which) -> closeGame());
+
+        alertDialog.show();
     }
 
     @Override
