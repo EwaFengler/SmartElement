@@ -7,6 +7,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +16,8 @@ public class CountdownActivity extends AppCompatActivity {
     public static final String MESSAGE_START_GAME = "start";
     private TextView countdownInfoTextView;
     private TextView countdownTimerTextView;
+
+    private boolean countdownStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,15 @@ public class CountdownActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras.getBoolean("opponentAlreadyStarted")) {
             startCountdownTimer();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (countdownStarted) {
+            Toast.makeText(getApplicationContext(), "Z tego miejsca nie ma powrotu", Toast.LENGTH_SHORT).show();
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -50,6 +62,7 @@ public class CountdownActivity extends AppCompatActivity {
 
     private void startCountdownTimer() {
         countdownInfoTextView.setText("Gra rozpocznie się za:");
+        countdownStarted = true;
 
         new CountDownTimer(5100, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -59,6 +72,7 @@ public class CountdownActivity extends AppCompatActivity {
             public void onFinish() {
                 Intent i = new Intent(CountdownActivity.this, GameActivity.class);
                 startActivity(i);
+                finish();
             }
         }.start();
     }

@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private View newGameButton;
 
-    private boolean DEV_MODE = true; //TODO wywalić
+    private boolean DEV_MODE = false; //TODO wywalić
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.Guideline;
 
@@ -95,9 +96,16 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             if (output[2] > 0.90) {
                                 move = "forward ";
                                 certainty = output[2];
+                                gameWrapper.onExecute();
                             } else if (output[0] > 0.90 || output[1] > 0.90) {
                                 move = horizontalOrVertical(input);
                                 certainty = Math.max(output[0], output[1]);
+                                if(move.equals("horizontal ")) {
+                                    gameWrapper.onShield();
+                                }
+                                else {
+                                    gameWrapper.onAttack();
+                                }
                             }
                             certainty = (float) ((int) (100 * certainty)) / 100;
                             Log.d("mlp", move + certainty);
@@ -162,6 +170,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
+    public void onBackPressed() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Powrót");
+        alertDialog.setMessage("Jesteś pewien, że chcesz zrezygnować z tej rozgrywki? Twój przeciwnik wygra walkowerem");
+
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Gram dalej", ((dialog, which) -> {}));
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Rezygnuję", (dialog, which) -> gameWrapper.finishGame(GameResult.LOSE));
+
+        alertDialog.show();
+    }
+
+    @Override
     public void onSensorChanged(SensorEvent event) {
         long moment = event.timestamp / 62500000;// 1:16s
 
@@ -193,6 +213,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         Intent i = new Intent(this, FinishGameActivity.class);
         i.putExtra("gameResult", gameResult);
         startActivity(i);
+        finish();
         //TODO
     }
 
