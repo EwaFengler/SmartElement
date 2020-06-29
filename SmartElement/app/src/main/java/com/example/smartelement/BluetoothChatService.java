@@ -68,6 +68,8 @@ public class BluetoothChatService {
     // Message types sent from the BluetoothChatService Handler
     public static final int MESSAGE_READ = 1;
     public static final int MESSAGE_DEVICE_NAME = 2;
+    public static final int MESSAGE_CONNECTION_FAILED = 3;
+    public static final int MESSAGE_CONNECTION_LOST = 4;
 
     private static BluetoothChatService bluetoothChatServiceObject;
 
@@ -236,6 +238,34 @@ public class BluetoothChatService {
     }
 
     /**
+     * Indicate that the connection attempt failed and notify the UI Activity.
+     */
+    private void connectionFailed() {
+        // Send a failure message back to the Activity
+        Message msg = handler.obtainMessage(MESSAGE_CONNECTION_FAILED);
+        handler.sendMessage(msg);
+
+        state = STATE_NONE;
+
+        // Start the service over to restart listening mode
+        BluetoothChatService.this.start();
+    }
+
+    /**
+     * Indicate that the connection was lost and notify the UI Activity.
+     */
+    private void connectionLost() {
+        // Send a failure message back to the Activity
+        Message msg = handler.obtainMessage(MESSAGE_CONNECTION_LOST);
+        handler.sendMessage(msg);
+
+        state = STATE_NONE;
+
+        // Start the service over to restart listening mode
+        BluetoothChatService.this.start();
+    }
+
+    /**
      * This thread runs while listening for incoming connections. It behaves
      * like a server-side client. It runs until a connection is accepted
      * (or until cancelled).
@@ -373,6 +403,7 @@ public class BluetoothChatService {
                     Log.e(TAG, "unable to close() " + mSocketType +
                             " socket during connection failure", e2);
                 }
+                connectionFailed();
                 return;
             }
 
@@ -438,6 +469,7 @@ public class BluetoothChatService {
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
+                    connectionLost();
                     break;
                 }
             }

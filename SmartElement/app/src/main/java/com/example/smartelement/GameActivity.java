@@ -244,4 +244,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void testSendAttack(View view) {
         gameWrapper.sendAttack((float) 4.8);
     }
+
+    public void finishGameConnectionLost() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Połączenie zerwane");
+        alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Ok", (dialog, which) -> finish());
+        alertDialog.show();
+    }
 }

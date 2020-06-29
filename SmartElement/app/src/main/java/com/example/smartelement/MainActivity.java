@@ -72,9 +72,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        setupChat();
         if (bluetoothChatService != null) {
             if (bluetoothChatService.getState() == BluetoothChatService.STATE_NONE) {
                 bluetoothChatService.start();
+            }
+
+            if(bluetoothChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+                newGameButton.setEnabled(false);
             }
         }
     }
@@ -139,6 +144,12 @@ public class MainActivity extends AppCompatActivity {
                     String opponentName = msg.getData().getString("device_name");
                     toast("Twój przeciwnik to " + opponentName);
                     newGameButton.setEnabled(true);
+                    break;
+                case BluetoothChatService.MESSAGE_CONNECTION_FAILED:
+                    toast("Nie udało się połączyć z przeciwnikiem");
+                    break;
+                case BluetoothChatService.MESSAGE_CONNECTION_LOST:
+                    toast("Połączenie zostało zerwane");
                     break;
             }
         }

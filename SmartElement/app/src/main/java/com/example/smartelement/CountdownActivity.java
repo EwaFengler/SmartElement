@@ -9,6 +9,7 @@ import android.os.Message;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class CountdownActivity extends AppCompatActivity {
@@ -18,6 +19,7 @@ public class CountdownActivity extends AppCompatActivity {
     private TextView countdownTimerTextView;
 
     private boolean countdownStarted = false;
+    private CountDownTimer countdownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,17 @@ public class CountdownActivity extends AppCompatActivity {
                 if (message.equals(MESSAGE_START_GAME)) {
                     startCountdownTimer();
                 }
+            } else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
+                if(countdownTimer != null) {
+                    countdownTimer.cancel();
+                }
+
+                AlertDialog alertDialog = new AlertDialog.Builder(CountdownActivity.this).create();
+                alertDialog.setTitle("Połączenie zerwane");
+                alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");
+
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Ok", (dialog, which) -> finish());
+                alertDialog.show();
             }
         }
     };
@@ -64,7 +77,7 @@ public class CountdownActivity extends AppCompatActivity {
         countdownInfoTextView.setText("Gra rozpocznie się za:");
         countdownStarted = true;
 
-        new CountDownTimer(5100, 1000) {
+        countdownTimer = new CountDownTimer(5100, 1000) {
             public void onTick(long millisUntilFinished) {
                 countdownTimerTextView.setText(String.valueOf(millisUntilFinished / 1000));
             }
