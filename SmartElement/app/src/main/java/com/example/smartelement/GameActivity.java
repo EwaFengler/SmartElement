@@ -1,6 +1,7 @@
 package com.example.smartelement;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -189,6 +190,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void finishGame(GameResult gameResult) {
+        Intent i = new Intent(this, FinishGameActivity.class);
+        i.putExtra("gameResult", gameResult);
+        startActivity(i);
         //TODO
     }
 
