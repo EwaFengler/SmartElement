@@ -225,9 +225,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         damageGuideline.setGuidelinePercent(damagePercentage);
 
         LinearLayout healthLayout = findViewById(R.id.healthLayout);
-        if (damagePercentage < 50 && damagePercentage >= 25) {
+        if (damagePercentage > 0.5 && damagePercentage <= 0.75) {
             healthLayout.setBackgroundColor(Color.parseColor("#FF9800"));
-        } else if (damagePercentage < 25) {
+        } else if (damagePercentage > 0.75) {
             healthLayout.setBackgroundColor(Color.parseColor("#F44336"));
         }
     }

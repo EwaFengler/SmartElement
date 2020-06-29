@@ -42,13 +42,14 @@ public class GameWrapper {
 
     public void onShield() {
         playerStatus.loadShield();
-        updateShield(playerStatus.getShieldStrength());
     }
 
     public void onExecute() {
         float attackStrength = playerStatus.execute();
         if (attackStrength > 0) {
             sendAttack(attackStrength);
+        } else {
+            updateShield(playerStatus.getShieldStrength());
         }
     }
 

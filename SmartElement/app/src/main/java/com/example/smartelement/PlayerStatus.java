@@ -43,8 +43,8 @@ public class PlayerStatus {
 
     public synchronized void receiveDamage(float damage) {
         if (damage > shieldStrength) {
-            shieldStrength = 0;
             health -= (damage - shieldStrength);
+            shieldStrength = 0;
 
             if (health <= 0) {
                 health = 0;
