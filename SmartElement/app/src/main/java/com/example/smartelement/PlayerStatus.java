@@ -59,6 +59,10 @@ public class PlayerStatus {
         return 1 - (health / MAX_HEALTH);
     }
 
+    synchronized public float getShieldStrength() {
+        return shieldStrength;
+    }
+
     public boolean isOver() {
         return over;
     }

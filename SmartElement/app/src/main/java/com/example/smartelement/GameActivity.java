@@ -3,6 +3,7 @@ package com.example.smartelement;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,6 +11,8 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.tensorflow.lite.Interpreter;
@@ -199,6 +202,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void updateHealth(float damagePercentage) {
         Guideline damageGuideline = findViewById(R.id.damageGuideline);
         damageGuideline.setGuidelinePercent(damagePercentage);
+
+        LinearLayout healthLayout = findViewById(R.id.healthLayout);
+        if (damagePercentage < 50 && damagePercentage >= 25) {
+            healthLayout.setBackgroundColor(Color.parseColor("#FF9800"));
+        } else if (damagePercentage < 25) {
+            healthLayout.setBackgroundColor(Color.parseColor("#F44336"));
+        }
+    }
+
+    public void updateShield(float shieldStrength) {
+        TextView shieldTextView = findViewById(R.id.shieldTextView);
+        shieldTextView.setText(String.valueOf(shieldStrength));
     }
 
     public void testSendFinish(View view) {

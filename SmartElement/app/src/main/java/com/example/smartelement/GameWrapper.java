@@ -42,6 +42,7 @@ public class GameWrapper {
 
     public void onShield() {
         playerStatus.loadShield();
+        updateShield(playerStatus.getShieldStrength());
     }
 
     public void onExecute() {
@@ -57,6 +58,7 @@ public class GameWrapper {
         } else if (message.startsWith(MESSAGE_ATTACK_PREFIX)) {
             float damage = Float.parseFloat(message.split(MESSAGE_ATTACK_PREFIX)[1]);
             playerStatus.receiveDamage(damage);
+            updateShield(playerStatus.getShieldStrength());
             updateHealth(playerStatus.getDamagePercentage());
 
             if (playerStatus.isOver()) {
@@ -78,5 +80,9 @@ public class GameWrapper {
 
     private void updateHealth(float damagePercentage) {
         gameActivity.updateHealth(damagePercentage);
+    }
+
+    private void updateShield(float shieldStrength) {
+        gameActivity.updateShield(shieldStrength);
     }
 }
