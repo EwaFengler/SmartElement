@@ -40,8 +40,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private float[] magnetometerReading = new float[3];
 
     //    private String MODEL_FILENAME = "ConvertedModel/model_xyzpr.tflite";
-    private String MODEL_FILENAME = "ConvertedModel/model_xy_zgravity.tflite";
-//    private String MODEL_FILENAME = "ConvertedModel/final_model_xy_zgravity.tflite";
+//    private String MODEL_FILENAME = "ConvertedModel/model_xy_zgravity.tflite";
+    private String MODEL_FILENAME = "ConvertedModel/model_xy_zgravity_all_every5.tflite";
 
 
     private long lastMoment = 0;
