@@ -63,6 +63,10 @@ public class PlayerStatus {
         return shieldStrength;
     }
 
+    public int getShieldLoaded() {
+        return shieldLoaded;
+    }
+
     public synchronized boolean isOver() {
         return over;
     }

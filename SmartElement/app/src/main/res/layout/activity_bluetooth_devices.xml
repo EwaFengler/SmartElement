@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="#666"
+        android:background="#4CAF50"
         android:gravity="center"
         android:padding="10dp"
         android:text="Wybierz przeciwnika"
@@ -28,7 +28,7 @@
         android:id="@+id/title_new_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#666"
+        android:background="#4CAF50"
         android:padding="10dp"
         android:text="Nie widzisz przeciwnika?\nJeśli grasz z kimś po raz pierwszy, najpierw sparuj urządzenia."
         android:textColor="#fff"
@@ -38,10 +38,12 @@
         android:id="@+id/button_bluetooth_settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#000000"
         android:onClick="openBluetoothSettings"
         android:paddingTop="24dp"
         android:paddingBottom="24dp"
         android:text="Paruj"
-        android:textSize="20sp" />
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
 
 </LinearLayout>

@@ -47,10 +47,12 @@ public class GameWrapper {
     }
 
     public void onExecute() {
+        int shieldLoaded = playerStatus.getShieldLoaded();
+
         float attackStrength = playerStatus.execute();
         if (attackStrength > 0) {
             sendAttack(attackStrength);
-        } else {
+        } else if (shieldLoaded > 0) {
             gameActivity.playShieldSound();
             updateShield(playerStatus.getShieldStrength());
         }
