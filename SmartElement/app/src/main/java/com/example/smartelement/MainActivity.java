@@ -37,10 +37,6 @@ public class MainActivity extends AppCompatActivity {
         newGameButton = findViewById(R.id.newGameButton);
         chooseOpponentButton = findViewById(R.id.chooseOponent);
 
-        if (DEV_MODE) {
-            newGameButton.setEnabled(true);
-        }
-
         if (sensorsAvailable()) {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (!bluetoothAdapter.isEnabled()) {
@@ -81,10 +77,14 @@ public class MainActivity extends AppCompatActivity {
                 bluetoothChatService.start();
             }
 
-            if(bluetoothChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
+            if (bluetoothChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
                 newGameButton.setEnabled(false);
                 chooseOpponentButton.setText("Wybierz przeciwnika");
             }
+        }
+
+        if (DEV_MODE) {
+            newGameButton.setEnabled(true);
         }
     }
 

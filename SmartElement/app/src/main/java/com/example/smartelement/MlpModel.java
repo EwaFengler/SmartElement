@@ -1,7 +1,7 @@
 package com.example.smartelement;
 
-
 import android.util.Log;
+
 import org.tensorflow.lite.Interpreter;
 
 public class MlpModel {

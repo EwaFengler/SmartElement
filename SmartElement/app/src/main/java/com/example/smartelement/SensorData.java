@@ -90,10 +90,6 @@ public class SensorData {
         gravityCounter = 0;
     }
 
-    public Deque<Float> getData() {
-        return data;
-    }
-
     public boolean isDataReady() {
         return ready;
     }

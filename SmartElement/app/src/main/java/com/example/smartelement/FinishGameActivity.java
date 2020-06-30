@@ -42,8 +42,7 @@ public class FinishGameActivity extends AppCompatActivity {
                 if (message.equals(CountdownActivity.MESSAGE_START_GAME)) {
                     MainActivity.opponentAlreadyStarted = true;
                 }
-            }
-            else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
+            } else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
                 AlertDialog alertDialog = new AlertDialog.Builder(FinishGameActivity.this).create();
                 alertDialog.setTitle("Połączenie zerwane");
                 alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");

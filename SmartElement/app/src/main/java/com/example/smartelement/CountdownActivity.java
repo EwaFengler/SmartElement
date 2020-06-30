@@ -59,7 +59,7 @@ public class CountdownActivity extends AppCompatActivity {
                     startCountdownTimer();
                 }
             } else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
-                if(countdownTimer != null) {
+                if (countdownTimer != null) {
                     countdownTimer.cancel();
                 }
 

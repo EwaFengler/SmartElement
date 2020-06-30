@@ -10,7 +10,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -103,10 +102,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             } else if (output[0] > 0.90 || output[1] > 0.90) {
                                 move = horizontalOrVertical(input);
                                 certainty = Math.max(output[0], output[1]);
-                                if(move.equals("horizontal ")) {
+                                if (move.equals("horizontal ")) {
                                     gameWrapper.onShield();
-                                }
-                                else {
+                                } else {
                                     gameWrapper.onAttack();
                                 }
                             }
@@ -178,7 +176,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         alertDialog.setTitle("Powrót");
         alertDialog.setMessage("Jesteś pewien, że chcesz zrezygnować z tej rozgrywki? Twój przeciwnik wygra walkowerem");
 
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Gram dalej", ((dialog, which) -> {}));
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Gram dalej", ((dialog, which) -> {
+        }));
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Rezygnuję", (dialog, which) -> gameWrapper.finishGame(GameResult.LOSE));
 
         alertDialog.show();
@@ -235,14 +234,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void updateShield(float shieldStrength) {
         TextView shieldTextView = findViewById(R.id.shieldTextView);
         shieldTextView.setText(String.valueOf(shieldStrength));
-    }
-
-    public void testSendFinish(View view) {
-        gameWrapper.finishGame(GameResult.LOSE);
-    }
-
-    public void testSendAttack(View view) {
-        gameWrapper.sendAttack((float) 4.8);
     }
 
     public void finishGameConnectionLost() {

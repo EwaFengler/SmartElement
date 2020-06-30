@@ -5,8 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
 public class GameWrapper {
 
 
@@ -32,10 +30,9 @@ public class GameWrapper {
             if (msg.what == BluetoothChatService.MESSAGE_READ) {
                 byte[] readBuf = (byte[]) msg.obj;
                 String message = new String(readBuf, 0, msg.arg1);
-                Toast.makeText(gameActivity, message, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(gameActivity, message, Toast.LENGTH_SHORT).show();
                 onBluetooth(message);
-            }
-            else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
+            } else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
                 gameActivity.finishGameConnectionLost();
             }
         }
