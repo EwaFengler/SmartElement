@@ -36,17 +36,23 @@ public class MainActivity extends AppCompatActivity {
         newGameButton = findViewById(R.id.newGameButton);
         chooseOpponentButton = findViewById(R.id.chooseOpponent);
 
-        if (sensorsAvailable()) {
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (!bluetoothAdapter.isEnabled()) {
-                activateBluetooth();
-            } else {
-                setupChat();
-            }
-        } else {
-            alertSensorNotAvailable();
-        }
+
     }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if (sensorsAvailable()) {
+//            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//            if (!bluetoothAdapter.isEnabled()) {
+//                activateBluetooth();
+//            } else {
+//                setupChat();
+//            }
+//        } else {
+//            alertSensorNotAvailable();
+//        }
+//    }
 
     private boolean sensorsAvailable() {
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -71,7 +77,16 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        setupChat();
+        if (sensorsAvailable()) {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (!bluetoothAdapter.isEnabled()) {
+                alertBluetoothRequired();
+            } else {
+                setupChat();
+            }
+        } else {
+            alertSensorNotAvailable();
+        }
 
         if (bluetoothChatService != null) {
             if (bluetoothChatService.getState() == BluetoothChatService.STATE_NONE) {
@@ -198,8 +213,6 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
                     setupChat();
-                } else {
-                    alertBluetoothRequired();
                 }
         }
     }
