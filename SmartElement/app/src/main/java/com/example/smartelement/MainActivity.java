@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -138,12 +139,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void opponentConnected() {
-        newGameButton.setEnabled(true);
+        newGameButton.setBackground(ContextCompat.getDrawable(this, R.drawable.button_background));
         chooseOpponentButton.setText("Zmień przeciwnika");
     }
 
     private void opponentDisconnected() {
-        newGameButton.setEnabled(false);
+        newGameButton.setBackground(ContextCompat.getDrawable(this, R.drawable.button_background_disabled));
+        newGameButton.setText("nowa gra");
         chooseOpponentButton.setText("Wybierz przeciwnika");
     }
 
@@ -161,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case BluetoothChatService.MESSAGE_DEVICE_NAME:
                     String opponentName = msg.getData().getString("device_name");
-                    toast("Twój przeciwnik to " + opponentName);
+                    newGameButton.setText("nowa gra z:\n" + opponentName);
                     opponentConnected();
                     break;
                 case BluetoothChatService.MESSAGE_CONNECTION_FAILED:
@@ -197,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     bluetoothChatService.connect(opponentAddress, false);
                 } else if (resultCode == BluetoothDevicesActivity.RESULT_OPPONENT_NAME) {
                     String opponentName = data.getStringExtra("opponentName");
-                    toast("Twój przeciwnik to " + opponentName);
+                    newGameButton.setText("nowa gra z:\n" + opponentName);
                     opponentConnected();
                 }
                 break;
