@@ -186,7 +186,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void onBackPressed() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Powrót");
-        alertDialog.setMessage("Jesteś pewien, że chcesz zrezygnować z tej rozgrywki? Twój przeciwnik wygra walkowerem");
+        alertDialog.setMessage("Jesteś pewien, że chcesz zrezygnować z tej rozgrywki? Twój przeciwnik wygra walkowerem.");
 
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Gram dalej", ((dialog, which) -> {
         }));
