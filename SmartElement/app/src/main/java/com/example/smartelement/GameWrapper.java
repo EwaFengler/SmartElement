@@ -14,7 +14,7 @@ public class GameWrapper {
     private GameActivity gameActivity;
     private BluetoothChatService bluetoothChatService;
 
-    private boolean gameOver = false;
+    boolean gameOver = false;
 
     public GameWrapper(GameActivity gameActivity) {
         this.gameActivity = gameActivity;

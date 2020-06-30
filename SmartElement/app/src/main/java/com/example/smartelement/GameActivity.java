@@ -179,7 +179,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Gram dalej", ((dialog, which) -> {
         }));
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Rezygnuję", (dialog, which) -> gameWrapper.finishGame(GameResult.LOSE));
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Rezygnuję", (dialog, which) -> {
+            if (!gameWrapper.gameOver)
+                gameWrapper.gameOver = true;
+            gameWrapper.finishGame(GameResult.LOSE);
+        });
 
         alertDialog.show();
     }
@@ -212,7 +216,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         //not implemented
     }
 
-    public void finishGame(GameResult gameResult) {
+    public synchronized void finishGame(GameResult gameResult) {
         Intent i = new Intent(this, FinishGameActivity.class);
         i.putExtra("gameResult", gameResult);
         startActivity(i);
@@ -249,7 +253,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         shieldTextView.setText(String.valueOf((int) shieldStrength));
     }
 
-    public void finishGameConnectionLost() {
+    public synchronized void finishGameConnectionLost() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Połączenie zerwane");
         alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");
