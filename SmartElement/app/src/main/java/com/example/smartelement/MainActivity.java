@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 case BluetoothChatService.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    toast(readMessage);
                     if (readMessage.equals(CountdownActivity.MESSAGE_START_GAME)) {
                         opponentAlreadyStarted = true;
                     }

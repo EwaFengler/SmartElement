@@ -233,7 +233,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     public void updateShield(float shieldStrength) {
         TextView shieldTextView = findViewById(R.id.shieldTextView);
-        shieldTextView.setText(String.valueOf(shieldStrength));
+        shieldTextView.setText(String.valueOf((int) shieldStrength));
     }
 
     public void finishGameConnectionLost() {
