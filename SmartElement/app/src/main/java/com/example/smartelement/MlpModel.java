@@ -1,18 +1,11 @@
 package com.example.smartelement;
 
-import android.util.Log;
-
 import org.tensorflow.lite.Interpreter;
 
 public class MlpModel {
-
-
-    private Interpreter interpreter;
+    private final Interpreter interpreter;
 
     public MlpModel(Interpreter interpreter) {
-        if (interpreter == null) {
-            Log.d("asdf", "NULL interpreter");
-        }
         this.interpreter = interpreter;
     }
 

@@ -10,9 +10,9 @@ public class GameWrapper {
     private final String MESSAGE_FINISH = "finish";
     private final String MESSAGE_ATTACK_PREFIX = "attack_";
 
-    PlayerStatus playerStatus = new PlayerStatus();
-    private GameActivity gameActivity;
-    private BluetoothChatService bluetoothChatService;
+    final PlayerStatus playerStatus = new PlayerStatus();
+    private final GameActivity gameActivity;
+    private final BluetoothChatService bluetoothChatService;
 
     boolean gameOver = false;
 
@@ -30,7 +30,6 @@ public class GameWrapper {
             if (msg.what == BluetoothChatService.MESSAGE_READ) {
                 byte[] readBuf = (byte[]) msg.obj;
                 String message = new String(readBuf, 0, msg.arg1);
-//                Toast.makeText(gameActivity, message, Toast.LENGTH_SHORT).show();
                 onBluetooth(message);
             } else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
                 gameActivity.finishGameConnectionLost();
@@ -47,15 +46,18 @@ public class GameWrapper {
     }
 
     public void onExecute() {
+        float attackStrength = playerStatus.execute();
         int shieldLoaded = playerStatus.getShieldLoaded();
 
-        float attackStrength = playerStatus.execute();
         if (attackStrength > 0) {
             sendAttack(attackStrength);
-        } else if (shieldLoaded > 0) {
+        }
+        if (shieldLoaded > 0) {
             gameActivity.playShieldSound();
             updateShield(playerStatus.getShieldStrength());
         }
+
+        playerStatus.reset();
     }
 
     public synchronized void onBluetooth(String message) {

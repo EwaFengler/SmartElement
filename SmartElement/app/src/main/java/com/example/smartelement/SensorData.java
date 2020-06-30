@@ -7,35 +7,26 @@ public class SensorData {
     private final Deque<Float> data = new ArrayDeque<>();
     private float xSum = 0;
     private float ySum = 0;
-    private float zSum = 0;
-    private float xgSum = 0;
-    private float ygSum = 0;
     private float zgSum = 0;
 
     private float xPrev = 0;
     private float yPrev = 0;
-    private float zPrev = 0;
-    private float xgPrev = 0;
-    private float ygPrev = 0;
     private float zgPrev = 0;
 
     private int accelerationCounter = 0;
     private int gravityCounter = 0;
 
-    private int DATA_SERIES = 3;
-    private int SIZE = DATA_SERIES * 20;
+    private final int DATA_SERIES = 3;
+    private final int SIZE = DATA_SERIES * 20;
     private boolean ready = false;
 
     public void addAccelerationValues(float[] accelerometerReading) {
         xSum += accelerometerReading[0];
         ySum += accelerometerReading[1];
-        zSum += accelerometerReading[2];
         accelerationCounter++;
     }
 
     public void addGravityValues(float[] gravityReading) {
-        xgSum += gravityReading[0];
-        ygSum += gravityReading[1];
         zgSum += gravityReading[2];
         gravityCounter++;
     }
@@ -54,18 +45,11 @@ public class SensorData {
         if (accelerationCounter > 0) {
             xPrev = xSum / accelerationCounter;
             yPrev = ySum / accelerationCounter;
-            zPrev = zSum / accelerationCounter;
 
-            xgPrev = xgSum / gravityCounter;
-            ygPrev = ygSum / gravityCounter;
             zgPrev = zgSum / gravityCounter;
         }
         data.add(xPrev);
         data.add(yPrev);
-//        data.add(zPrev);
-
-//        data.add(xgPrev);
-//        data.add(ygPrev);
         data.add(zgPrev);
     }
 
@@ -80,10 +64,6 @@ public class SensorData {
     public void resetSensorValues() {
         xSum = 0;
         ySum = 0;
-        zSum = 0;
-
-        xgSum = 0;
-        ygSum = 0;
         zgSum = 0;
 
         accelerationCounter = 0;
@@ -105,5 +85,4 @@ public class SensorData {
         }
         return array;
     }
-
 }
