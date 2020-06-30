@@ -140,12 +140,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void opponentConnected() {
         newGameButton.setBackground(ContextCompat.getDrawable(this, R.drawable.button_background));
+        newGameButton.setEnabled(true);
         chooseOpponentButton.setText("Zmień przeciwnika");
     }
 
     private void opponentDisconnected() {
         newGameButton.setBackground(ContextCompat.getDrawable(this, R.drawable.button_background_disabled));
         newGameButton.setText("nowa gra");
+        newGameButton.setEnabled(false);
         chooseOpponentButton.setText("Wybierz przeciwnika");
     }
 
