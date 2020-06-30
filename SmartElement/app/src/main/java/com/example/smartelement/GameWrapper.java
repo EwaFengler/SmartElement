@@ -15,11 +15,12 @@ public class GameWrapper {
     private GameActivity gameActivity;
     private BluetoothChatService bluetoothChatService;
 
+    private boolean gameOver = false;
+
     public GameWrapper(GameActivity gameActivity) {
         this.gameActivity = gameActivity;
         bluetoothChatService = BluetoothChatService.getInstance();
         bluetoothChatService.setHandler(handler);
-
     }
 
 
@@ -55,8 +56,9 @@ public class GameWrapper {
         }
     }
 
-    public void onBluetooth(String message) {
-        if (message.equals(MESSAGE_FINISH)) {
+    public synchronized void onBluetooth(String message) {
+        if (message.equals(MESSAGE_FINISH) && !gameOver) {
+            gameOver = true;
             finishGame(GameResult.WIN);
         } else if (message.startsWith(MESSAGE_ATTACK_PREFIX)) {
             float damage = 0;
@@ -69,17 +71,20 @@ public class GameWrapper {
             updateShield(playerStatus.getShieldStrength());
             updateHealth(playerStatus.getDamagePercentage());
 
-            if (playerStatus.isOver()) {
+            if (playerStatus.isOver() && !gameOver) {
+                gameOver = true;
                 finishGame(GameResult.LOSE);
             }
         }
     }
 
     public void sendAttack(float attackStrength) {
-        bluetoothChatService.sendMessage(MESSAGE_ATTACK_PREFIX + attackStrength);
+        if (!gameOver) {
+            bluetoothChatService.sendMessage(MESSAGE_ATTACK_PREFIX + attackStrength);
+        }
     }
 
-    public void finishGame(GameResult gameResult) {
+    public synchronized void finishGame(GameResult gameResult) {
         if (gameResult == GameResult.LOSE) {
             bluetoothChatService.sendMessage(MESSAGE_FINISH);
         }

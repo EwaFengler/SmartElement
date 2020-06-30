@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case BluetoothChatService.MESSAGE_CONNECTION_LOST:
                     toast("Połączenie zostało zerwane");
+                    opponentDisconnected();
                     break;
             }
         }
