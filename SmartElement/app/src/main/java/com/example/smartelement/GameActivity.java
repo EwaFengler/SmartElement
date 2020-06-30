@@ -9,6 +9,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
@@ -50,6 +51,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private final Object dataMonitor = new Object();
     private GameWrapper gameWrapper;
 
+    private MediaPlayer shieldSound;
+    private MediaPlayer damageSound;
+    private MediaPlayer winSound;
+    private MediaPlayer loseSound;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +76,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 
         sensorData = new SensorData();
+
+        shieldSound = MediaPlayer.create(this, R.raw.shield);
+        damageSound = MediaPlayer.create(this, R.raw.damage);
+        winSound = MediaPlayer.create(this, R.raw.win);
+        loseSound = MediaPlayer.create(this, R.raw.lose);
 
         new Timer().schedule(new TimerTask() {
             @Override
@@ -251,6 +262,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void updateShield(float shieldStrength) {
         TextView shieldTextView = findViewById(R.id.shieldTextView);
         shieldTextView.setText(String.valueOf((int) shieldStrength));
+    }
+
+    public void playShieldSound() {
+        shieldSound.start();
+    }
+
+    public void playDamageSound() {
+        damageSound.start();
+    }
+
+    public void playWinSound() {
+        winSound.start();
+    }
+
+    public void playLoseSound() {
+        loseSound.start();
     }
 
     public synchronized void finishGameConnectionLost() {

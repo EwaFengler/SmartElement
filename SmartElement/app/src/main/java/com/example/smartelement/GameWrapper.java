@@ -51,6 +51,7 @@ public class GameWrapper {
         if (attackStrength > 0) {
             sendAttack(attackStrength);
         } else {
+            gameActivity.playShieldSound();
             updateShield(playerStatus.getShieldStrength());
         }
     }
@@ -58,6 +59,7 @@ public class GameWrapper {
     public synchronized void onBluetooth(String message) {
         if (message.equals(MESSAGE_FINISH) && !gameOver) {
             gameOver = true;
+            gameActivity.playWinSound();
             finishGame(GameResult.WIN);
         } else if (message.startsWith(MESSAGE_ATTACK_PREFIX)) {
             float damage = 0;
@@ -72,7 +74,10 @@ public class GameWrapper {
 
             if (playerStatus.isOver() && !gameOver) {
                 gameOver = true;
+                gameActivity.playLoseSound();
                 finishGame(GameResult.LOSE);
+            } else {
+                gameActivity.playDamageSound();
             }
         }
     }
