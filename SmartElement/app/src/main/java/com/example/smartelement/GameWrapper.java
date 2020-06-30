@@ -3,7 +3,6 @@ package com.example.smartelement;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
 public class GameWrapper {
 

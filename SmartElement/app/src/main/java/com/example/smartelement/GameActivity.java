@@ -2,6 +2,7 @@ package com.example.smartelement;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -215,8 +216,20 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         Intent i = new Intent(this, FinishGameActivity.class);
         i.putExtra("gameResult", gameResult);
         startActivity(i);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (gameResult == GameResult.WIN) {
+            int win = sharedPreferences.getInt("win", 0);
+            editor.putInt("win", win + 1);
+
+        } else {
+            int lose = sharedPreferences.getInt("lose", 0);
+            editor.putInt("lose", lose + 1);
+        }
+        editor.apply();
         finish();
-        //TODO
     }
 
     public void updateHealth(float damagePercentage) {
