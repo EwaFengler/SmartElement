@@ -12,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Set;
 
@@ -20,8 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class BluetoothDevicesActivity extends AppCompatActivity {
 
-    public static int RESULT_ADDRESS = 1;
-    public static int RESULT_OPPONENT_NAME = 2;
+    public static final int RESULT_ADDRESS = 1;
+    public static final int RESULT_OPPONENT_NAME = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +50,11 @@ public class BluetoothDevicesActivity extends AppCompatActivity {
                 pairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         } else {
-            pairedDevicesArrayAdapter.add("Brak sparowanych urządzeń");
+            pairedDevicesArrayAdapter.add(getString(R.string.no_paired_devices));
         }
     }
 
-    private AdapterView.OnItemClickListener chooseDevice
+    private final AdapterView.OnItemClickListener chooseDevice
             = (av, v, arg2, arg3) -> {
         String info = ((TextView) v).getText().toString();
         String address = info.substring(info.length() - 17);

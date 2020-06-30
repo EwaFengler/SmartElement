@@ -11,7 +11,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,11 +39,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private Sensor gravitySensor;
 
     private SensorData sensorData;
-    private float[] linearAccelerationReading = new float[3];
-    private float[] gravityReading = new float[3];
-
-    private String MODEL_FILENAME = "ConvertedModel/hopefully_final_model_xy_zgravity.tflite";
-
+    private final float[] linearAccelerationReading = new float[3];
+    private final float[] gravityReading = new float[3];
 
     private long lastMoment = 0;
 
@@ -90,71 +86,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         float[] input = sensorData.getDataArray();
                         float[] output = mlpModel.run(input);
 
-                        log_output("mlp", output);
-
                         runOnUiThread(() -> {
-//                            if (output[0] > 0.90) {
-//                                Log.d("mlp", "horizontal " + output[0]);
-//                            }
-//                            if (output[1] > 0.90) {
-//                                Log.d("mlp", "vertical " + output[1]);
-//                            }
-//                            if (output[2] > 0.90) {
-//                                Log.d("mlp", "forward " + output[2]);
-//                            }
-                            String move = "---- ";
-                            float certainty = Math.max(output[0], Math.max(output[1], output[2]));
-                            certainty = (float) ((int) (100 * certainty)) / 100;
-
-
-                            if (output[2] > 0.90) {
-                                move = "forward ";
-                                certainty = output[2];
-                                gameWrapper.onExecute();
-                            } else if (output[0] > 0.90 || output[1] > 0.90) {
-                                move = horizontalOrVertical(input);
-                                certainty = Math.max(output[0], output[1]);
-                                if (move.equals("horizontal ")) {
-                                    gameWrapper.onShield();
-                                } else {
-                                    gameWrapper.onAttack();
-                                }
+                            if (output[0] > 0.90) {
+                                gameWrapper.onShield();
                             }
-                            certainty = (float) ((int) (100 * certainty)) / 100;
-                            Log.d("mlp", move + certainty);
+                            if (output[1] > 0.90) {
+                                gameWrapper.onAttack();
+                            }
+                            if (output[2] > 0.90) {
+                                gameWrapper.onExecute();
+                            }
                         });
                     }
                 }
             }
-        }, new Date(), 200);//TODO może być częściej (próbka co 62,5) ale żeby nie stwierdzało dwa razy tego samego
-    }
-
-    private String horizontalOrVertical(float[] input) {
-        float sumZG = 0;
-        int len = input.length / 3;
-        for (int i = 0; i < len; i++) {
-            sumZG += input[3 * i + 2];
-        }
-
-        float meanZG = sumZG / len;
-
-        return Math.abs(meanZG) > 5 ? "horizontal " : "vertical ";
-    }
-
-    private void log_output(String tag, float[] output) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (float x : output) {
-            int a = (int) (100 * x);
-            stringBuilder.append((float) a / 100);
-            stringBuilder.append(" ");
-        }
-
-        Log.d(tag, "\n" + stringBuilder.toString());
+        }, new Date(), 200);
     }
 
     private void loadModel() throws IOException {
-        String modelFilename = MODEL_FILENAME;
+        String modelFilename = "ConvertedModel/model_xy_zgravity.tflite";
         Interpreter tflite = new Interpreter(loadModelFile(modelFilename));
         mlpModel = new MlpModel(tflite);
     }
@@ -185,12 +135,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onBackPressed() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Powrót");
-        alertDialog.setMessage("Jesteś pewien, że chcesz zrezygnować z tej rozgrywki? Twój przeciwnik wygra walkowerem.");
+        alertDialog.setTitle(getString(R.string.alert_title_return));
+        alertDialog.setMessage(getString(R.string.alert_message_return_are_you_sure));
 
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Gram dalej", ((dialog, which) -> {
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.btn_keep_playing), ((dialog, which) -> {
         }));
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Rezygnuję", (dialog, which) -> {
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.alert_resign), (dialog, which) -> {
             if (!gameWrapper.gameOver)
                 gameWrapper.gameOver = true;
             gameWrapper.finishGame(GameResult.LOSE);
@@ -282,8 +232,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     public synchronized void finishGameConnectionLost() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Połączenie zerwane");
-        alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");
+        alertDialog.setTitle(getString(R.string.alert_title_conncetion_lost));
+        alertDialog.setMessage(getString(R.string.alert_message_connection_lost));
 
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Ok", (dialog, which) -> finish());
         alertDialog.show();

@@ -7,9 +7,8 @@
     tools:context=".FinishGameActivity">
 
     <Button
-        android:id="@+id/okButton"
         android:onClick="okButtonClicked"
-        android:text="Ok"
+        android:text="@string/OK"
         android:textSize="36sp"
 
         android:layout_width="0dp"

@@ -1,3 +1,43 @@
 <resources>
     <string name="app_name">SmartElement</string>
+
+    <string name="choose_opponent">Wybierz przeciwnika</string>
+    <string name="change_opponent">Zmień przeciwnika</string>
+
+    <string name="no_paired_devices">Brak sparowanych urządzeń</string>
+    <string name="pair_hint">Nie widzisz przeciwnika?\nJeśli grasz z kimś po raz pierwszy, najpierw sparuj urządzenia.</string>
+    <string name="pair">Paruj</string>
+
+    <string name="btn_new_game">Nowa gra</string>
+    <string name="btn_new_game_with_name">Nowa gra z:\n%1$s</string>
+
+    <string name="profile">Profil</string>
+    <string name="won">Wygrane:</string>
+    <string name="lost">Przegrane:</string>
+    <string name="points">Punkty:</string>
+
+    <string name="wait_for_opponent">Poczekaj, aż przeciwnik dołączy do gry.</string>
+    <string name="game_starts_in">Gra rozpocznie się za:</string>
+
+    <string name="finish_won">Wygrałeś</string>
+    <string name="finish_lose">Przegrałeś</string>
+    <string name="OK">OK</string>
+
+    <string name="alert_title_conncetion_lost">Połączenie zerwane</string>
+    <string name="alert_message_connection_lost">Połączenie z przeciwnikiem zostało przerwane.</string>
+
+    <string name="alert_title_return">Powrót</string>
+    <string name="alert_message_return_are_you_sure">Jesteś pewien, że chcesz zrezygnować z tej rozgrywki? Twój przeciwnik wygra walkowerem.</string>
+    <string name="btn_keep_playing">Gram dalej</string>
+    <string name="alert_resign">Rezygnuję</string>
+
+    <string name="alert_title_sensor_unavailable">Sensor niedostępny</string>
+    <string name="alert_message_sensor_unavailable">Przepraszamy, nie możesz zagrać w tę grę. Twoje urządzenie nie posiada odpowiednich sensorów.</string>
+    <string name="alert_btn_close_game">Zamknij grę</string>
+
+    <string name="alert_title_bluetooth_request">Bluetooth</string>
+    <string name="alert_message_bluetooth_request">Gra wymaga Bluetooth do komunikacji. Zostaniesz poproszony o aktywowanie go.</string>
+
+    <string name="toast_connection_failed">Nie udało się połączyć z przeciwnikiem</string>
+    <string name="toast_connection_lost">Połączenie zostało zerwane</string>
 </resources>

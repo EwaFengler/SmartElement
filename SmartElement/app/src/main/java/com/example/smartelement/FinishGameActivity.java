@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,11 +22,16 @@ public class FinishGameActivity extends AppCompatActivity {
         BluetoothChatService bluetoothChatService = BluetoothChatService.getInstance();
         bluetoothChatService.setHandler(handler);
 
-        GameResult gameResult = (GameResult) getIntent().getExtras().get("gameResult");
-        if (gameResult.equals(GameResult.WIN)) {
-            gameResultTextView.setText("Wygrałeś");
-        } else {
-            gameResultTextView.setText("Przegrałeś");
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            GameResult gameResult = (GameResult) extras.get("gameResult");
+            if (gameResult != null) {
+                if (gameResult.equals(GameResult.WIN)) {
+                    gameResultTextView.setText(R.string.finish_won);
+                } else {
+                    gameResultTextView.setText(R.string.finish_lose);
+                }
+            }
         }
     }
 
@@ -43,8 +47,8 @@ public class FinishGameActivity extends AppCompatActivity {
                 }
             } else if (msg.what == BluetoothChatService.MESSAGE_CONNECTION_LOST) {
                 AlertDialog alertDialog = new AlertDialog.Builder(FinishGameActivity.this).create();
-                alertDialog.setTitle("Połączenie zerwane");
-                alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");
+                alertDialog.setTitle(getString(R.string.alert_title_conncetion_lost));
+                alertDialog.setMessage(getString(R.string.alert_message_connection_lost));
 
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Ok", (dialog, which) -> finish());
                 alertDialog.show();

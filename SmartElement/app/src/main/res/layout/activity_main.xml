@@ -18,7 +18,7 @@
         android:bottomRightRadius="20dp"
         android:enabled="false"
         android:onClick="startNewGame"
-        android:text="Nowa gra"
+        android:text="@string/btn_new_game"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:topLeftRadius="20dp"
@@ -27,10 +27,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chooseOponent" />
+        app:layout_constraintTop_toBottomOf="@+id/chooseOpponent" />
 
     <Button
-        android:id="@+id/chooseOponent"
+        android:id="@+id/chooseOpponent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
@@ -38,7 +38,7 @@
         android:height="80dp"
         android:background="@drawable/button_background"
         android:onClick="chooseOpponent"
-        android:text="Wybierz przeciwnika"
+        android:text="@string/choose_opponent"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/newGameButton"
@@ -56,7 +56,7 @@
         android:height="80dp"
         android:background="@drawable/button_background"
         android:onClick="showProfile"
-        android:text="profil"
+        android:text="@string/profile"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"

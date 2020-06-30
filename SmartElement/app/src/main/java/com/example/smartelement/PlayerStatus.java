@@ -2,9 +2,12 @@ package com.example.smartelement;
 
 public class PlayerStatus {
 
-    private static float MAX_HEALTH = 100;
-    private static float BASIC_ATTACK = 5;
-    private static float BASIC_SHIELD = 5;
+    private static final float MAX_HEALTH = 100;
+    private static final float BASIC_ATTACK = 5;
+    private static final float BASIC_SHIELD = 5;
+
+    private static final float MIN_ATTACK = 3;
+    private static final float MIN_SHIELD = 3;
 
     private float health = MAX_HEALTH;
     private int attackLoaded = 0;
@@ -14,29 +17,25 @@ public class PlayerStatus {
 
     public synchronized void loadAttack() {
         attackLoaded++;
-        if (shieldLoaded > 0) {
-            shieldLoaded = 0;
-        }
     }
 
     public synchronized void loadShield() {
         shieldLoaded++;
-        if (attackLoaded > 0) {
-            attackLoaded = 0;
-        }
     }
 
     public synchronized float execute() {
         float attackStrength = 0;
 
-        if (attackLoaded > 0) {
+        if (attackLoaded > MIN_ATTACK) {
             attackStrength = getAttackStrength();
-        } else if (shieldLoaded > 0) {
-            fortifyShield();
+        } else {
+            resetAttackLoaded();
         }
-
-        resetAttackLoaded();
-        resetShieldLoaded();
+        if (shieldLoaded > MIN_SHIELD) {
+            fortifyShield();
+        } else {
+            resetShieldLoaded();
+        }
 
         return attackStrength;
     }
@@ -65,6 +64,11 @@ public class PlayerStatus {
 
     public int getShieldLoaded() {
         return shieldLoaded;
+    }
+
+    public void reset() {
+        resetAttackLoaded();
+        resetShieldLoaded();
     }
 
     public synchronized boolean isOver() {

@@ -33,8 +33,10 @@ public class CountdownActivity extends AppCompatActivity {
         bluetoothChatService.setHandler(handler);
 
         Bundle extras = getIntent().getExtras();
-        if (extras.getBoolean("opponentAlreadyStarted")) {
-            startCountdownTimer();
+        if (extras != null) {
+            if (extras.getBoolean("opponentAlreadyStarted")) {
+                startCountdownTimer();
+            }
         }
     }
 
@@ -64,8 +66,8 @@ public class CountdownActivity extends AppCompatActivity {
                 }
 
                 AlertDialog alertDialog = new AlertDialog.Builder(CountdownActivity.this).create();
-                alertDialog.setTitle("Połączenie zerwane");
-                alertDialog.setMessage("Połączenie z przeciwnikiem zostało przerwane.");
+                alertDialog.setTitle(getString(R.string.alert_title_conncetion_lost));
+                alertDialog.setMessage(getString(R.string.alert_message_connection_lost));
 
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Ok", (dialog, which) -> finish());
                 alertDialog.show();
@@ -74,7 +76,7 @@ public class CountdownActivity extends AppCompatActivity {
     };
 
     private void startCountdownTimer() {
-        countdownInfoTextView.setText("Gra rozpocznie się za:");
+        countdownInfoTextView.setText(R.string.game_starts_in);
         countdownStarted = true;
 
         countdownTimer = new CountDownTimer(5100, 1000) {

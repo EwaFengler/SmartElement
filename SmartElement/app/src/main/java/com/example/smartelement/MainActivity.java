@@ -29,26 +29,30 @@ public class MainActivity extends AppCompatActivity {
     private Button newGameButton;
     private Button chooseOpponentButton;
 
-    private boolean DEV_MODE = false; //TODO wywalić
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         newGameButton = findViewById(R.id.newGameButton);
-        chooseOpponentButton = findViewById(R.id.chooseOponent);
+        chooseOpponentButton = findViewById(R.id.chooseOpponent);
 
-        if (sensorsAvailable()) {
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (!bluetoothAdapter.isEnabled()) {
-                activateBluetooth();
-            } else {
-                setupChat();
-            }
-        } else {
-            alertSensorNotAvailable();
-        }
+
     }
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if (sensorsAvailable()) {
+//            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//            if (!bluetoothAdapter.isEnabled()) {
+//                activateBluetooth();
+//            } else {
+//                setupChat();
+//            }
+//        } else {
+//            alertSensorNotAvailable();
+//        }
+//    }
 
     private boolean sensorsAvailable() {
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -61,10 +65,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void alertSensorNotAvailable() {
         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-        alertDialog.setTitle("Sensor niedostępny");
-        alertDialog.setMessage("Przepraszamy, nie możesz zagrać w tą grę. Twoje urządzenie nie posiada odpowiednich sensorów.");
+        alertDialog.setTitle(getString(R.string.alert_title_sensor_unavailable));
+        alertDialog.setMessage(getString(R.string.alert_message_sensor_unavailable));
 
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Zamknij grę", (dialog, which) -> closeGame());
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.alert_btn_close_game), (dialog, which) -> closeGame());
 
         alertDialog.show();
     }
@@ -73,7 +77,16 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        setupChat();
+        if (sensorsAvailable()) {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (!bluetoothAdapter.isEnabled()) {
+                alertBluetoothRequired();
+            } else {
+                setupChat();
+            }
+        } else {
+            alertSensorNotAvailable();
+        }
 
         if (bluetoothChatService != null) {
             if (bluetoothChatService.getState() == BluetoothChatService.STATE_NONE) {
@@ -85,10 +98,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 opponentDisconnected();
             }
-        }
-
-        if (DEV_MODE) {
-            newGameButton.setEnabled(true);
         }
     }
 
@@ -113,16 +122,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startNewGame(View view) {
-        if (DEV_MODE) {
-            Intent i = new Intent(this, GameActivity.class);
-            startActivity(i);
-        } else {
-            bluetoothChatService.sendMessage(CountdownActivity.MESSAGE_START_GAME);
-            Intent i = new Intent(this, CountdownActivity.class);
-            i.putExtra("opponentAlreadyStarted", opponentAlreadyStarted);
-            opponentAlreadyStarted = false;
-            startActivity(i);
-        }
+        bluetoothChatService.sendMessage(CountdownActivity.MESSAGE_START_GAME);
+        Intent i = new Intent(this, CountdownActivity.class);
+        i.putExtra("opponentAlreadyStarted", opponentAlreadyStarted);
+        opponentAlreadyStarted = false;
+        startActivity(i);
+
     }
 
     private void closeGame() {
@@ -141,14 +146,14 @@ public class MainActivity extends AppCompatActivity {
     private void opponentConnected() {
         newGameButton.setBackground(ContextCompat.getDrawable(this, R.drawable.button_background));
         newGameButton.setEnabled(true);
-        chooseOpponentButton.setText("Zmień przeciwnika");
+        chooseOpponentButton.setText(R.string.change_opponent);
     }
 
     private void opponentDisconnected() {
         newGameButton.setBackground(ContextCompat.getDrawable(this, R.drawable.button_background_disabled));
-        newGameButton.setText("nowa gra");
+        newGameButton.setText(R.string.btn_new_game);
         newGameButton.setEnabled(false);
-        chooseOpponentButton.setText("Wybierz przeciwnika");
+        chooseOpponentButton.setText(R.string.choose_opponent);
     }
 
     @SuppressLint("HandlerLeak")
@@ -165,14 +170,14 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case BluetoothChatService.MESSAGE_DEVICE_NAME:
                     String opponentName = msg.getData().getString("device_name");
-                    newGameButton.setText("nowa gra z:\n" + opponentName);
+                    newGameButton.setText(getString(R.string.btn_new_game_with_name, opponentName));
                     opponentConnected();
                     break;
                 case BluetoothChatService.MESSAGE_CONNECTION_FAILED:
-                    toast("Nie udało się połączyć z przeciwnikiem");
+                    toast(getString(R.string.toast_connection_failed));
                     break;
                 case BluetoothChatService.MESSAGE_CONNECTION_LOST:
-                    toast("Połączenie zostało zerwane");
+                    toast(getString(R.string.toast_connection_lost));
                     opponentDisconnected();
                     break;
             }
@@ -181,11 +186,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void alertBluetoothRequired() {
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Bluetooth");
-        alertDialog.setMessage("Proszę, aktywuj Bluetooth");
+        alertDialog.setTitle(getString(R.string.alert_title_bluetooth_request));
+        alertDialog.setMessage(getString(R.string.alert_message_bluetooth_request));
 
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", (dialog, which) -> activateBluetooth());
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Zamknij grę", (dialog, which) -> closeGame());
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.OK), (dialog, which) -> activateBluetooth());
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.alert_btn_close_game), (dialog, which) -> closeGame());
 
         alertDialog.show();
     }
@@ -201,15 +206,13 @@ public class MainActivity extends AppCompatActivity {
                     bluetoothChatService.connect(opponentAddress, false);
                 } else if (resultCode == BluetoothDevicesActivity.RESULT_OPPONENT_NAME) {
                     String opponentName = data.getStringExtra("opponentName");
-                    newGameButton.setText("nowa gra z:\n" + opponentName);
+                    newGameButton.setText(getString(R.string.btn_new_game_with_name, opponentName));
                     opponentConnected();
                 }
                 break;
             case REQUEST_ENABLE_BT:
                 if (resultCode == RESULT_OK) {
                     setupChat();
-                } else {
-                    alertBluetoothRequired();
                 }
         }
     }
