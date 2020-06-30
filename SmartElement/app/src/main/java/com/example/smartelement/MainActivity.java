@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,11 +21,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_BLUETOOTH_DEVICES_ACTIVITY = 2;
 
-    private boolean opponentAlreadyStarted = false;
+    public static boolean opponentAlreadyStarted = false;
 
     private BluetoothChatService bluetoothChatService = null;
 
-    private View newGameButton;
+    private Button newGameButton;
+    private Button chooseOpponentButton;
 
     private boolean DEV_MODE = false; //TODO wywalić
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         newGameButton = findViewById(R.id.newGameButton);
+        chooseOpponentButton = findViewById(R.id.chooseOponent);
 
         if (DEV_MODE) {
             newGameButton.setEnabled(true);
@@ -80,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(bluetoothChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
                 newGameButton.setEnabled(false);
+                chooseOpponentButton.setText("Wybierz przeciwnika");
             }
         }
     }
@@ -98,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void chooseOpponent(View view) {
+        bluetoothChatService.start();
+        opponentAlreadyStarted = false;
         Intent i = new Intent(this, BluetoothDevicesActivity.class);
         startActivityForResult(i, REQUEST_BLUETOOTH_DEVICES_ACTIVITY);
     }
@@ -110,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             bluetoothChatService.sendMessage(CountdownActivity.MESSAGE_START_GAME);
             Intent i = new Intent(this, CountdownActivity.class);
             i.putExtra("opponentAlreadyStarted", opponentAlreadyStarted);
+            opponentAlreadyStarted = false;
             startActivity(i);
         }
     }
@@ -144,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                     String opponentName = msg.getData().getString("device_name");
                     toast("Twój przeciwnik to " + opponentName);
                     newGameButton.setEnabled(true);
+                    chooseOpponentButton.setText("Zmień przeciwnika");
                     break;
                 case BluetoothChatService.MESSAGE_CONNECTION_FAILED:
                     toast("Nie udało się połączyć z przeciwnikiem");

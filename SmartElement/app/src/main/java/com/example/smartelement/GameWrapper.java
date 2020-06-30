@@ -62,7 +62,12 @@ public class GameWrapper {
         if (message.equals(MESSAGE_FINISH)) {
             finishGame(GameResult.WIN);
         } else if (message.startsWith(MESSAGE_ATTACK_PREFIX)) {
-            float damage = Float.parseFloat(message.split(MESSAGE_ATTACK_PREFIX)[1]);
+            float damage = 0;
+            try {
+                damage = Float.parseFloat(message.split(MESSAGE_ATTACK_PREFIX)[1]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             playerStatus.receiveDamage(damage);
             updateShield(playerStatus.getShieldStrength());
             updateHealth(playerStatus.getDamagePercentage());
