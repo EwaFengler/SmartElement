@@ -38,7 +38,6 @@ public class FinishGameActivity extends AppCompatActivity {
             if (msg.what == BluetoothChatService.MESSAGE_READ) {
                 byte[] readBuf = (byte[]) msg.obj;
                 String message = new String(readBuf, 0, msg.arg1);
-                Toast.makeText(FinishGameActivity.this, message, Toast.LENGTH_SHORT).show();
                 if (message.equals(CountdownActivity.MESSAGE_START_GAME)) {
                     MainActivity.opponentAlreadyStarted = true;
                 }

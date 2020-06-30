@@ -71,15 +71,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+
         setupChat();
+
         if (bluetoothChatService != null) {
             if (bluetoothChatService.getState() == BluetoothChatService.STATE_NONE) {
                 bluetoothChatService.start();
             }
 
-            if (bluetoothChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
-                newGameButton.setEnabled(false);
-                chooseOpponentButton.setText("Wybierz przeciwnika");
+            if (bluetoothChatService.getState() == BluetoothChatService.STATE_CONNECTED) {
+                opponentConnected();
+            } else {
+                opponentDisconnected();
             }
         }
 
@@ -134,6 +137,16 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    private void opponentConnected() {
+        newGameButton.setEnabled(true);
+        chooseOpponentButton.setText("Zmień przeciwnika");
+    }
+
+    private void opponentDisconnected() {
+        newGameButton.setEnabled(false);
+        chooseOpponentButton.setText("Wybierz przeciwnika");
+    }
+
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler() {
         @Override
@@ -149,8 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 case BluetoothChatService.MESSAGE_DEVICE_NAME:
                     String opponentName = msg.getData().getString("device_name");
                     toast("Twój przeciwnik to " + opponentName);
-                    newGameButton.setEnabled(true);
-                    chooseOpponentButton.setText("Zmień przeciwnika");
+                    opponentConnected();
                     break;
                 case BluetoothChatService.MESSAGE_CONNECTION_FAILED:
                     toast("Nie udało się połączyć z przeciwnikiem");
@@ -179,9 +191,13 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode) {
             case REQUEST_BLUETOOTH_DEVICES_ACTIVITY:
-                if (resultCode == RESULT_OK) {
+                if (resultCode == BluetoothDevicesActivity.RESULT_ADDRESS) {
                     String opponentAddress = data.getStringExtra("MAC_address");
                     bluetoothChatService.connect(opponentAddress, false);
+                } else if (resultCode == BluetoothDevicesActivity.RESULT_OPPONENT_NAME) {
+                    String opponentName = data.getStringExtra("opponentName");
+                    toast("Twój przeciwnik to " + opponentName);
+                    opponentConnected();
                 }
                 break;
             case REQUEST_ENABLE_BT:
